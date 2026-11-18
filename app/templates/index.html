@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Készlet – Mini Inventory{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div>
+    <p class="eyebrow">KÉSZLETNYILVÁNTARTÁS</p>
+    <h1>Termékek</h1>
+    <p class="muted">Kezeld a raktárban nyilvántartott termékeket és készletmennyiségeket.</p>
+  </div>
+  <div class="stat-card">
+    <span class="stat-number">{{ products|length }}</span>
+    <span class="stat-label">termék</span>
+    <span class="low-stock">{{ low_stock_count }} alacsony készletű</span>
+  </div>
+</section>
+
+<section class="panel">
+  <h2>Új termék hozzáadása</h2>
+  <form action="{{ url_for('inventory.add_product') }}" method="post" class="product-form">
+    <label>Cikkszám
+      <input name="sku" maxlength="40" placeholder="PL-001" required>
+    </label>
+    <label>Terméknév
+      <input name="name" maxlength="120" placeholder="Például: Szenzor" required>
+    </label>
+    <label>Egységár (Ft)
+      <input name="price" type="number" min="0" step="0.01" placeholder="2490" required>
+    </label>
+    <label>Kezdő készlet (db)
+      <input name="quantity" type="number" min="0" step="1" placeholder="10" required>
+    </label>
+    <button type="submit">Termék hozzáadása</button>
+  </form>
+</section>
+
+<section class="panel">
+  <div class="section-heading">
+    <h2>Készlet</h2>
+    <span class="muted">Figyelmeztetés: 5 db alatti készlet</span>
+  </div>
+  {% if products %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Cikkszám</th><th>Termék</th><th>Egységár</th><th>Készlet</th><th>Készletművelet</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for product in products %}
+        <tr>
+          <td class="sku">{{ product.sku }}</td>
+          <td>{{ product.name }}</td>
+          <td>{{ "%.2f"|format(product.price) }} Ft</td>
+          <td>
+            {% if product.quantity < 5 %}
+              <span class="stock-pill warning">{{ product.quantity }} db · Alacsony</span>
+            {% else %}
+              <span class="stock-pill">{{ product.quantity }} db</span>
+            {% endif %}
+          </td>
+          <td>
+            <form class="stock-form" action="{{ url_for('inventory.update_stock', product_id=product.id) }}" method="post">
+              <input name="change" type="number" step="1" value="1" aria-label="Készletváltozás">
+              <button type="submit" class="secondary">Módosít</button>
+            </form>
+          </td>
+          <td>
+            <form action="{{ url_for('inventory.delete_product', product_id=product.id) }}" method="post">
+              <button type="submit" class="danger" onclick="return confirm('Biztosan törlöd ezt a terméket?')">Törlés</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <div class="empty-state">
+      <strong>Még nincs termék a nyilvántartásban.</strong>
+      <p>Az űrlap segítségével add hozzá az első terméket.</p>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}
