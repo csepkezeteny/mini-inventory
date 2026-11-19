@@ -63,7 +63,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/csepkezetenys/mini-inventory
+          images: ghcr.io/csepkezeteny/mini-inventory
           tags: |
             type=raw,value=latest
             type=sha,format=short
@@ -82,4 +82,4 @@ jobs:
           northflank-api-key: ${{ secrets.NORTHFLANK_API_KEY }}
           project-id: ${{ env.PROJECT_ID }}
           service-id: ${{ env.SERVICE_ID }}
-          image-path: ghcr.io/csepkezetenys/mini-inventory:latest
+          image-path: ghcr.io/csepkezeteny/mini-inventory:latest
